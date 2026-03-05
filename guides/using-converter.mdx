@@ -1,0 +1,178 @@
+---
+title: 'Using the Converter'
+description: 'Learn how to use the Currency Converter to perform currency conversions'
+icon: 'calculator'
+---
+
+The Currency Converter provides an interactive menu interface for converting between different currencies. This guide walks you through the conversion process step by step.
+
+## Menu Interface
+
+When you launch the application, you'll see the main menu with all available conversion options:
+
+```
+Sea bienvenido/a al Conversor de Moneda =]
+
+==================================================
+1) Dólar           =>> Peso argentino
+2) Peso argentino  =>> Dólar
+3) Dólar           =>> Real brasileño
+4) Real brasileño  =>> Dólar
+5) Dólar           =>> Peso colombiano
+6) Peso colombiano =>> Dólar
+7) Historial de conversiones
+8) Salir
+==================================================
+Elija una opción válida:
+```
+
+<Note>
+The menu is displayed from `Conversor.eleccionUserMenu()` in `/workspace/source/src/lad/com/alura/conversormoneda/vista/Conversor.java:4-18`
+</Note>
+
+## Step-by-Step Conversion Process
+
+<CardGroup cols={2}>
+  <Card title="Step 1" icon="1">
+    Select a conversion option (1-6) from the menu by entering the corresponding number
+  </Card>
+  <Card title="Step 2" icon="2">
+    Enter the amount you want to convert when prompted
+  </Card>
+  <Card title="Step 3" icon="3">
+    The application fetches real-time rates from ExchangeRate-API
+  </Card>
+  <Card title="Step 4" icon="4">
+    View your conversion result with the target currency code
+  </Card>
+</CardGroup>
+
+### Conversion Flow
+
+The application processes your conversion request as follows:
+
+1. **Menu Selection**: Choose from options 1-6 for different currency pairs
+2. **Amount Input**: Enter the value to convert (accepts decimal numbers)
+3. **API Request**: The app calls `ConsultaMoneda.obtenerTasa()` which fetches current exchange rates
+4. **Result Display**: Shows the converted amount with the target currency code
+5. **History Tracking**: Automatically saves the conversion to your history with timestamp
+
+<Info>
+The conversion logic uses Java's modern `switch` expression with `yield` statements to map menu options to currency pairs. See `ConversorApp.java:50-76`
+</Info>
+
+## Available Conversion Options
+
+<Accordion title="Option 1: USD to ARS">
+  Converts US Dollars to Argentine Pesos
+  
+  **Example**:
+  ```
+  Ingrese el valor que desea convertir: 100
+  El valor es: 35000.00 [ARS]
+  ```
+</Accordion>
+
+<Accordion title="Option 2: ARS to USD">
+  Converts Argentine Pesos to US Dollars
+  
+  **Example**:
+  ```
+  Ingrese el valor que desea convertir: 35000
+  El valor es: 100.00 [USD]
+  ```
+</Accordion>
+
+<Accordion title="Option 3: USD to BRL">
+  Converts US Dollars to Brazilian Reais
+  
+  **Example**:
+  ```
+  Ingrese el valor que desea convertir: 100
+  El valor es: 495.50 [BRL]
+  ```
+</Accordion>
+
+<Accordion title="Option 4: BRL to USD">
+  Converts Brazilian Reais to US Dollars
+  
+  **Example**:
+  ```
+  Ingrese el valor que desea convertir: 495.50
+  El valor es: 100.00 [USD]
+  ```
+</Accordion>
+
+<Accordion title="Option 5: USD to COP">
+  Converts US Dollars to Colombian Pesos
+  
+  **Example**:
+  ```
+  Ingrese el valor que desea convertir: 100
+  El valor es: 380000.00 [COP]
+  ```
+</Accordion>
+
+<Accordion title="Option 6: COP to USD">
+  Converts Colombian Pesos to US Dollars
+  
+  **Example**:
+  ```
+  Ingrese el valor que desea convertir: 380000
+  El valor es: 100.00 [USD]
+  ```
+</Accordion>
+
+## Input Validation
+
+The application handles various input scenarios:
+
+- **Valid Options (1-6)**: Proceeds with currency conversion
+- **History Option (7)**: Displays conversion history
+- **Exit Option (8)**: Closes the application gracefully
+- **Invalid Options**: Displays "Opción no válida. Intente de nuevo." and returns to menu
+
+<Note>
+Input validation is handled in `ConversorApp.java:43` for conversion options and `ConversorApp.java:86-88` for invalid entries
+</Note>
+
+## Reading Output
+
+After a successful conversion, the output format is:
+
+```
+El valor es: [CONVERTED_AMOUNT] [TARGET_CURRENCY_CODE]
+```
+
+**Output Components**:
+- **CONVERTED_AMOUNT**: The calculated result as a decimal number
+- **TARGET_CURRENCY_CODE**: Three-letter ISO currency code (USD, ARS, BRL, COP)
+
+### Real Example
+
+```
+Elija una opción válida: 1
+Ingrese el valor que desea convertir: 50
+El valor es: 17500.00 [ARS]
+```
+
+This shows converting 50 USD to 17,500 Argentine Pesos using the current exchange rate.
+
+<Info>
+The result is displayed in `ConversorApp.java:80` and automatically saved to history with a timestamp in `ConversorApp.java:83-84`
+</Info>
+
+## Error Handling
+
+If the API connection fails, you'll see:
+
+```
+Error al conectar con la API: [error message]
+El valor es: 0.0 [TARGET_CURRENCY]
+```
+
+This indicates a network issue or API unavailability. The method returns 0 as a fallback value.
+
+<Note>
+Error handling is implemented in `ConsultaMoneda.java:31-34`
+</Note>

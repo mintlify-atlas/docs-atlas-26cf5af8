@@ -1,0 +1,187 @@
+---
+title: Installation
+description: Install and set up the Currency Converter application on your system
+---
+
+## Prerequisites
+
+Before installing the Currency Converter, ensure you have the following:
+
+<CardGroup cols={2}>
+  <Card title="Java JDK" icon="java">
+    Java Development Kit 11 or higher
+  </Card>
+  <Card title="Git" icon="git-alt">
+    Git for cloning the repository
+  </Card>
+</CardGroup>
+
+<Note>
+  The application requires **Java 11+** because it uses modern features like `HttpClient`, `var`, switch expressions with `yield`, and records.
+</Note>
+
+### Verify Java Installation
+
+Check your Java version:
+
+```bash
+java -version
+javac -version
+```
+
+You should see output indicating Java 11 or higher. If not, download and install the latest JDK from [Oracle](https://www.oracle.com/java/technologies/downloads/) or [OpenJDK](https://openjdk.org/).
+
+## Installation Steps
+
+<Steps>
+  <Step title="Clone the Repository">
+    Clone the Currency Converter repository to your local machine:
+    
+    ```bash
+    git clone https://github.com/yourusername/currency-converter.git
+    cd currency-converter
+    ```
+    
+    <Note>
+      Replace `yourusername` with the actual GitHub username or organization where the repository is hosted.
+    </Note>
+  </Step>
+  
+  <Step title="Verify Project Structure">
+    Ensure the project structure is correct:
+    
+    ```bash
+    ls -la
+    ```
+    
+    You should see:
+    ```
+    ├── lib/
+    │   └── gson-2.10.1.jar
+    ├── src/
+    │   └── lad/com/alura/conversormoneda/
+    ├── .gitignore
+    └── Conversor_de_Moneda_Challenge_ONE_Java_Backend.iml
+    ```
+  </Step>
+  
+  <Step title="Compile the Application">
+    Compile the Java source files with the Gson dependency:
+    
+    ```bash
+    javac -cp "lib/gson-2.10.1.jar" -d out src/lad/com/alura/conversormoneda/**/*.java
+    ```
+    
+    This command:
+    - `-cp "lib/gson-2.10.1.jar"` - Adds Gson library to the classpath
+    - `-d out` - Outputs compiled `.class` files to the `out` directory
+    - `src/lad/com/alura/conversormoneda/**/*.java` - Compiles all Java files in the package
+    
+    <Note>
+      If you're on Windows, use semicolons instead of colons in the classpath: `-cp "lib/gson-2.10.1.jar"`
+    </Note>
+  </Step>
+  
+  <Step title="Verify Compilation">
+    Check that the compilation was successful:
+    
+    ```bash
+    ls out/lad/com/alura/conversormoneda/
+    ```
+    
+    You should see the compiled directories:
+    ```
+    controladores/
+    modelos/
+    vista/
+    ```
+  </Step>
+</Steps>
+
+## Alternative: Using an IDE
+
+You can also open the project in your favorite Java IDE:
+
+<Tabs>
+  <Tab title="IntelliJ IDEA">
+    1. Open IntelliJ IDEA
+    2. Select **File > Open**
+    3. Navigate to the project directory and select it
+    4. IntelliJ will automatically detect the `.iml` file
+    5. Right-click on `lib/gson-2.10.1.jar` and select **Add as Library**
+    6. Run the application from `ConversorApp.java`
+  </Tab>
+  
+  <Tab title="Eclipse">
+    1. Open Eclipse
+    2. Select **File > Import > Existing Projects into Workspace**
+    3. Browse to the project directory
+    4. Right-click the project > **Build Path > Configure Build Path**
+    5. Click **Add External JARs** and select `lib/gson-2.10.1.jar`
+    6. Run the application from `ConversorApp.java`
+  </Tab>
+  
+  <Tab title="VS Code">
+    1. Open VS Code
+    2. Install the **Extension Pack for Java**
+    3. Open the project folder
+    4. The Java extension will automatically detect the project
+    5. Add `lib/gson-2.10.1.jar` to the classpath in `.vscode/settings.json`:
+    ```json
+    {
+      "java.project.referencedLibraries": [
+        "lib/**/*.jar"
+      ]
+    }
+    ```
+    6. Run the application from `ConversorApp.java`
+  </Tab>
+</Tabs>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="ClassNotFoundException: com.google.gson">
+    This error means the Gson library is not in your classpath.
+    
+    **Solution**: Make sure to include `-cp "lib/gson-2.10.1.jar"` when compiling and running:
+    
+    ```bash
+    javac -cp "lib/gson-2.10.1.jar" -d out src/lad/com/alura/conversormoneda/**/*.java
+    java -cp "out:lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+    ```
+  </Accordion>
+  
+  <Accordion title="Error: release version 11 not supported">
+    Your Java version is too old.
+    
+    **Solution**: Upgrade to Java 11 or higher. The application uses modern Java features like:
+    - `java.net.http.HttpClient` (Java 11+)
+    - Records (Java 14+, used in `RegistroConversion`)
+    - Switch expressions with `yield` (Java 13+)
+  </Accordion>
+  
+  <Accordion title="javac: file not found">
+    The path to source files is incorrect.
+    
+    **Solution**: Make sure you're in the project root directory and the `src` folder exists:
+    
+    ```bash
+    pwd  # Should show the project root
+    ls src/lad/com/alura/conversormoneda/  # Should list the package directories
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  The application includes an API key for ExchangeRate-API in the source code. For production use, you should:
+  1. Register for your own API key at [exchangerate-api.com](https://www.exchangerate-api.com/)
+  2. Store the key in an environment variable
+  3. Load it from configuration instead of hardcoding
+</Warning>
+
+## Next Steps
+
+<Card title="Quick Start Guide" icon="rocket" href="/quickstart">
+  Learn how to run the application and perform your first currency conversion
+</Card>

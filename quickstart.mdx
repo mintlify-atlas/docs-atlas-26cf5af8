@@ -1,80 +1,337 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Get started with your first currency conversion in minutes
 ---
 
-## Get started in three steps
+## Run the Application
 
-Get your documentation site running locally and make your first customization.
+Once you've installed and compiled the Currency Converter, you're ready to perform your first conversion.
 
-### Step 1: Set up your local environment
+<Steps>
+  <Step title="Run the Application">
+    From the project root directory, run:
+    
+    ```bash
+    java -cp "out:lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+    ```
+    
+    <Note>
+      On Windows, use a semicolon instead of a colon: `java -cp "out;lib/gson-2.10.1.jar" ...`
+    </Note>
+    
+    You should see the welcome menu:
+    
+    ```
+    Sea bienvenido/a al Conversor de Moneda =]
+    
+    ==================================================
+    1) Dólar           =>> Peso argentino
+    2) Peso argentino  =>> Dólar
+    3) Dólar           =>> Real brasileño
+    4) Real brasileño  =>> Dólar
+    5) Dólar           =>> Peso colombiano
+    6) Peso colombiano =>> Dólar
+    7) Historial de conversiones
+    8) Salir
+    ==================================================
+    Elija una opción válida:
+    ```
+  </Step>
+  
+  <Step title="Select a Conversion Option">
+    Let's convert 100 USD to Argentine Pesos. Type `1` and press Enter:
+    
+    ```
+    Elija una opción válida:
+    1
+    ```
+  </Step>
+  
+  <Step title="Enter the Amount">
+    When prompted, enter the amount you want to convert:
+    
+    ```
+    Ingrese el valor que desea convertir:
+    100
+    ```
+    
+    The application will:
+    1. Make an HTTP request to ExchangeRate-API
+    2. Fetch the current USD to ARS exchange rate
+    3. Calculate the conversion
+    4. Display the result
+    5. Save the conversion to history
+    
+    ```
+    El valor es: 81500.0 [ARS]
+    ```
+    
+    <Note>
+      Exchange rates are fetched in real-time, so your result may differ based on current market rates.
+    </Note>
+  </Step>
+  
+  <Step title="Try Another Conversion">
+    The menu will appear again. Let's convert Brazilian Real to USD. Type `4`:
+    
+    ```
+    Elija una opción válida:
+    4
+    Ingrese el valor que desea convertir:
+    500
+    ```
+    
+    Result:
+    ```
+    El valor es: 92.45 [USD]
+    ```
+  </Step>
+  
+  <Step title="View Conversion History">
+    To see all your conversions, select option `7`:
+    
+    ```
+    Elija una opción válida:
+    7
+    ```
+    
+    You'll see a formatted history with timestamps:
+    
+    ```
+    --- HISTORIAL DE CONVERSIONES ---
+    [05-03-2026 10:23:15] 100.0 USD =>> 81500.0 ARS
+    [05-03-2026 10:24:32] 500.0 BRL =>> 92.45 USD
+    ---------------------------------
+    ```
+    
+    <Note>
+      History is stored in memory and will be cleared when you exit the application.
+    </Note>
+  </Step>
+  
+  <Step title="Exit the Application">
+    When you're done, select option `8` to exit:
+    
+    ```
+    Elija una opción válida:
+    8
+    Gracias por usar el conversor.
+    ```
+  </Step>
+</Steps>
+
+## Understanding the Menu Options
+
+Here's what each menu option does:
+
+<Tabs>
+  <Tab title="Options 1-6: Conversions">
+    **Currency Pair Conversions**
+    
+    | Option | From | To | Example |
+    |--------|------|----|---------|
+    | 1 | USD | ARS | Convert dollars to Argentine pesos |
+    | 2 | ARS | USD | Convert Argentine pesos to dollars |
+    | 3 | USD | BRL | Convert dollars to Brazilian reais |
+    | 4 | BRL | USD | Convert Brazilian reais to dollars |
+    | 5 | USD | COP | Convert dollars to Colombian pesos |
+    | 6 | COP | USD | Convert Colombian pesos to dollars |
+    
+    Each conversion:
+    - Fetches the current exchange rate from ExchangeRate-API
+    - Performs the calculation server-side for accuracy
+    - Returns the result in the target currency
+    - Saves the conversion to your session history
+  </Tab>
+  
+  <Tab title="Option 7: History">
+    **View Conversion History**
+    
+    Displays all conversions you've made during the current session. Each entry shows:
+    - **Timestamp**: Date and time of the conversion (format: `dd-MM-yyyy HH:mm:ss`)
+    - **Base currency**: The currency you converted from
+    - **Amount**: The original amount entered
+    - **Target currency**: The currency you converted to
+    - **Result**: The converted amount
+    
+    Example output:
+    ```
+    [05-03-2026 10:23:15] 100.0 USD =>> 81500.0 ARS
+    ```
+    
+    <Warning>
+      History is stored in an `ArrayList` in memory and is lost when the application exits.
+    </Warning>
+  </Tab>
+  
+  <Tab title="Option 8: Exit">
+    **Exit the Application**
+    
+    Gracefully closes the application:
+    - Displays a goodbye message
+    - Closes the Scanner input stream
+    - Terminates the program
+    
+    Your conversion history will be lost upon exit.
+  </Tab>
+</Tabs>
+
+## Example Session
+
+Here's a complete example session:
+
+<CodeGroup>
+```bash Example Session
+$ java -cp "out:lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+
+Sea bienvenido/a al Conversor de Moneda =]
+
+==================================================
+1) Dólar           =>> Peso argentino
+2) Peso argentino  =>> Dólar
+3) Dólar           =>> Real brasileño
+4) Real brasileño  =>> Dólar
+5) Dólar           =>> Peso colombiano
+6) Peso colombiano =>> Dólar
+7) Historial de conversiones
+8) Salir
+==================================================
+Elija una opción válida:
+1
+Ingrese el valor que desea convertir:
+50
+El valor es: 40750.0 [ARS]
+
+Elija una opción válida:
+3
+Ingrese el valor que desea convertir:
+200
+El valor es: 1089.50 [BRL]
+
+Elija una opción válida:
+7
+
+--- HISTORIAL DE CONVERSIONES ---
+[05-03-2026 14:30:22] 50.0 USD =>> 40750.0 ARS
+[05-03-2026 14:31:05] 200.0 USD =>> 1089.50 BRL
+---------------------------------
+
+Elija una opción válida:
+8
+Gracias por usar el conversor.
+```
+</CodeGroup>
+
+## Behind the Scenes
+
+When you perform a conversion, here's what happens:
+
+<Steps>
+  <Step title="API Request">
+    The application makes an HTTP GET request to ExchangeRate-API:
+    
+    ```java
+    String url = "https://v6.exchangerate-api.com/v6/API_KEY/pair/" 
+                 + monedaBase + "/" + monedaObjetivo + "/" + cantidad;
+    ```
+    
+    Example: `https://v6.exchangerate-api.com/v6/API_KEY/pair/USD/ARS/100`
+  </Step>
+  
+  <Step title="JSON Response">
+    The API returns a JSON response:
+    
+    ```json
+    {
+      "result": "success",
+      "base_code": "USD",
+      "target_code": "ARS",
+      "conversion_rate": 815.0,
+      "conversion_result": 81500.0
+    }
+    ```
+  </Step>
+  
+  <Step title="Parse with Gson">
+    The application uses Gson to parse the JSON and extract the `conversion_result`:
+    
+    ```java
+    JsonElement elemento = JsonParser.parseString(respuesta.body());
+    JsonObject objectRoot = elemento.getAsJsonObject();
+    return objectRoot.get("conversion_result").getAsDouble();
+    ```
+  </Step>
+  
+  <Step title="Save to History">
+    A `RegistroConversion` record is created and added to the history:
+    
+    ```java
+    RegistroConversion registro = new RegistroConversion(
+        base, 
+        objetivo, 
+        cantidad, 
+        resultado, 
+        LocalDateTime.now()
+    );
+    historial.add(registro);
+    ```
+  </Step>
+</Steps>
+
+## Common Tasks
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion title="Convert a specific amount">
+    1. Run the application
+    2. Select the appropriate currency pair (options 1-6)
+    3. Enter your amount when prompted
+    4. View the converted result
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+  
+  <Accordion title="Track multiple conversions">
+    1. Perform several conversions using different currency pairs
+    2. Select option 7 to view your complete history
+    3. All conversions are listed with timestamps
+  </Accordion>
+  
+  <Accordion title="Compare exchange rates over time">
+    1. Perform a conversion and note the rate
+    2. Wait a few minutes or hours
+    3. Perform the same conversion again
+    4. View history (option 7) to compare the results
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+    <Note>
+      Exchange rates update frequently based on market conditions.
+    </Note>
+  </Accordion>
+  
+  <Accordion title="Recover from invalid input">
+    If you enter an invalid option:
+    ```
+    Elija una opción válida:
+    9
+    Opción no válida. Intente de nuevo.
+    ```
+    
+    The menu will reappear, allowing you to select a valid option.
   </Accordion>
 </AccordionGroup>
 
-### Step 2: Deploy your changes
+## Next Steps
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
+Now that you've completed your first conversion, explore more:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Architecture" icon="diagram-project" href="/reference/architecture">
+    Learn how the application is structured
+  </Card>
+  <Card title="Code Structure" icon="code" href="/reference/code-structure">
+    Explore the codebase and class documentation
+  </Card>
+  <Card title="API Integration" icon="plug" href="/reference/api-integration">
+    Understand how ExchangeRate-API is integrated
+  </Card>
+  <Card title="Using the Converter" icon="money-bill-transfer" href="/guides/using-converter">
+    Learn advanced usage patterns
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

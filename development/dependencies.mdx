@@ -1,0 +1,184 @@
+---
+title: Dependencies
+description: External libraries and dependencies used in the Currency Converter
+---
+
+The Currency Converter has minimal dependencies and uses manual compilation without build tools like Maven or Gradle.
+
+## External Dependencies
+
+### Gson 2.10.1
+
+**Location**: `lib/gson-2.10.1.jar`
+
+**Purpose**: JSON parsing and serialization for API responses
+
+**Usage**: The `ConsultaMoneda` class uses Gson to parse JSON responses from the ExchangeRate-API:
+
+```java
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+// Parsing API response
+JsonElement elemento = JsonParser.parseString(respuesta.body());
+JsonObject objectRoot = elemento.getAsJsonObject();
+return objectRoot.get("conversion_result").getAsDouble();
+```
+
+**Why Gson?**
+- Lightweight and reliable
+- Simple API for parsing JSON
+- No additional dependencies
+- Widely used in Java projects
+
+## Java Standard Library
+
+The application relies on several Java standard library packages:
+
+### HTTP Client (java.net.http)
+
+**Introduced**: Java 11
+
+**Usage**: Making HTTP requests to the ExchangeRate-API
+
+```java
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+HttpClient cliente = HttpClient.newHttpClient();
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create(url))
+    .GET()
+    .build();
+```
+
+Referenced in: `src/lad/com/alura/conversormoneda/modelos/ConsultaMoneda.java:6-9`
+
+### Scanner (java.util)
+
+**Usage**: Reading user input from console
+
+```java
+import java.util.Scanner;
+
+Scanner sc = new Scanner(System.in);
+int opcion = sc.nextInt();
+double cantidad = sc.nextDouble();
+```
+
+Referenced in: `src/lad/com/alura/conversormoneda/controladores/ConversorApp.java:10`
+
+### LocalDateTime (java.time)
+
+**Usage**: Timestamping conversion history records
+
+```java
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+RegistroConversion registro = new RegistroConversion(
+    base, objetivo, cantidad, resultado, LocalDateTime.now()
+);
+```
+
+Referenced in: `src/lad/com/alura/conversormoneda/controladores/ConversorApp.java:7`
+
+### Collections (java.util)
+
+**Usage**: Managing conversion history
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+List<RegistroConversion> historial = new ArrayList<>();
+```
+
+Referenced in: `src/lad/com/alura/conversormoneda/controladores/ConversorApp.java:8-9`
+
+## No Build Tool Required
+
+<Note>
+This project intentionally does not use Maven or Gradle. It demonstrates pure Java compilation with manual dependency management.
+</Note>
+
+### Why No Build Tool?
+
+- **Educational simplicity**: Focus on Java fundamentals
+- **Minimal setup**: No build configuration files needed
+- **Single dependency**: Only Gson JAR required
+- **Transparent process**: See exactly what happens during compilation
+
+### Comparison with Build Tools
+
+| Aspect | Manual Compilation | Maven/Gradle |
+|--------|-------------------|-------------|
+| Setup complexity | Minimal | Requires build file |
+| Dependencies | 1 JAR file | Automatic download |
+| Learning curve | Low | Medium-High |
+| Build reproducibility | Manual | Automated |
+| Best for | Learning, small projects | Production, large teams |
+
+## Updating Gson
+
+If you need to update Gson to a newer version:
+
+<Steps>
+
+### Download the new version
+
+Visit the [Gson releases page](https://github.com/google/gson/releases) and download the desired JAR file.
+
+### Replace the JAR file
+
+```bash
+cd source/lib
+rm gson-2.10.1.jar
+# Copy your new gson-X.X.X.jar to this directory
+```
+
+### Update compilation commands
+
+Modify the classpath in your build commands:
+
+```bash
+javac -cp "lib/gson-X.X.X.jar" -d out src/lad/com/alura/conversormoneda/**/*.java
+java -cp "out:lib/gson-X.X.X.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+```
+
+### Test the application
+
+Run the application and verify all conversions work correctly.
+
+</Steps>
+
+<Tip>
+Gson maintains backward compatibility across minor versions. Updating from 2.10.1 to 2.10.x should be seamless.
+</Tip>
+
+## Dependency Verification
+
+Verify the Gson JAR is present:
+
+```bash
+ls -lh source/lib/gson-2.10.1.jar
+```
+
+Expected output: `~277 KB` file size
+
+## API Dependency
+
+**External Service**: ExchangeRate-API (v6)
+
+**Endpoint**: `https://v6.exchangerate-api.com/v6/`
+
+**Usage**: Real-time currency conversion rates
+
+<Note>
+The application requires an active internet connection to fetch current exchange rates. The API key is embedded in the source code for demonstration purposes.
+</Note>
+
+Referenced in: `src/lad/com/alura/conversormoneda/modelos/ConsultaMoneda.java:17`

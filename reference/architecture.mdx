@@ -1,0 +1,276 @@
+---
+title: 'System Architecture'
+description: 'Understanding the MVC architecture and design patterns used in the Currency Converter'
+icon: 'diagram-project'
+---
+
+## Overview
+
+The Currency Converter application follows the **Model-View-Controller (MVC)** architectural pattern, implementing object-oriented programming (OOP) principles to ensure clean separation of concerns and maintainable code.
+
+## MVC Pattern Implementation
+
+The application is structured into three distinct layers, each with specific responsibilities:
+
+```mermaid
+graph TD
+    A[User] --> B[Vista/Conversor]
+    B --> C[Controladores/ConversorApp]
+    C --> D[Modelos/ConsultaMoneda]
+    C --> E[Modelos/RegistroConversion]
+    D --> F[ExchangeRate-API]
+    E --> C
+```
+
+### Controller Layer (Controladores)
+
+**Package:** `lad.com.alura.conversormoneda.controladores`
+
+The controller layer orchestrates application flow and business logic.
+
+<CodeGroup>
+```java ConversorApp.java
+public class ConversorApp {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        // Instantiate service (OOP principle)
+        ConsultaMoneda consulta = new ConsultaMoneda();
+        // Create history list
+        List<RegistroConversion> historial = new ArrayList<>();
+        // Main application loop
+    }
+}
+```
+</CodeGroup>
+
+**Responsibilities:**
+- Application entry point (`main` method)
+- User input handling and validation
+- Orchestrating interactions between View and Model
+- Managing conversion history
+- Business logic for currency pair selection
+
+### Model Layer (Modelos)
+
+**Package:** `lad.com.alura.conversormoneda.modelos`
+
+The model layer contains business entities and service classes.
+
+#### ConsultaMoneda (Service)
+
+Handles external API communication and data retrieval.
+
+```java
+public class ConsultaMoneda {
+    public double obtenerTasa(String monedaBase, 
+                             String monedaObjetivo, 
+                             double cantidad) {
+        // HTTP client implementation
+        // API request and response handling
+    }
+}
+```
+
+#### RegistroConversion (Entity)
+
+Immutable data structure using Java 14+ `record` feature.
+
+```java
+public record RegistroConversion(
+    String monedaBase, 
+    String monedaObjetivo, 
+    double cantidad, 
+    double resultado, 
+    LocalDateTime fechaHora
+) {
+    @Override
+    public String toString() {
+        // Custom formatting for display
+    }
+}
+```
+
+### View Layer (Vista)
+
+**Package:** `lad.com.alura.conversormoneda.vista`
+
+The view layer handles user interface and presentation logic.
+
+```java
+public class Conversor {
+    public static void eleccionUserMenu() {
+        // Display menu using text blocks (Java 13+)
+    }
+}
+```
+
+**Responsibilities:**
+- User interface presentation
+- Menu display
+- User interaction prompts
+
+## Package Structure
+
+```
+src/lad/com/alura/conversormoneda/
+├── controladores/
+│   └── ConversorApp.java       # Main controller and entry point
+├── modelos/
+│   ├── ConsultaMoneda.java     # API service class
+│   └── RegistroConversion.java # Data entity (record)
+└── vista/
+    └── Conversor.java          # User interface
+```
+
+## Class Relationships
+
+<Tabs>
+  <Tab title="Class Diagram">
+```mermaid
+classDiagram
+    class ConversorApp {
+        +main(String[] args)$ void
+        -Scanner sc
+        -ConsultaMoneda consulta
+        -List~RegistroConversion~ historial
+    }
+    
+    class ConsultaMoneda {
+        +obtenerTasa(String, String, double) double
+    }
+    
+    class RegistroConversion {
+        +String monedaBase
+        +String monedaObjetivo
+        +double cantidad
+        +double resultado
+        +LocalDateTime fechaHora
+        +toString() String
+    }
+    
+    class Conversor {
+        +eleccionUserMenu()$ void
+    }
+    
+    ConversorApp --> ConsultaMoneda : uses
+    ConversorApp --> RegistroConversion : creates
+    ConversorApp --> Conversor : calls
+    ConsultaMoneda --> ExchangeRateAPI : HTTP request
+```
+  </Tab>
+  <Tab title="Sequence Diagram">
+```mermaid
+sequenceDiagram
+    participant User
+    participant Conversor
+    participant ConversorApp
+    participant ConsultaMoneda
+    participant API as ExchangeRate-API
+    
+    User->>Conversor: Start Application
+    Conversor->>User: Display Menu
+    User->>ConversorApp: Select Option & Amount
+    ConversorApp->>ConsultaMoneda: obtenerTasa(base, target, amount)
+    ConsultaMoneda->>API: HTTP GET Request
+    API->>ConsultaMoneda: JSON Response
+    ConsultaMoneda->>ConversorApp: Return Conversion Rate
+    ConversorApp->>ConversorApp: Create RegistroConversion
+    ConversorApp->>User: Display Result
+```
+  </Tab>
+</Tabs>
+
+## Design Decisions
+
+### Object-Oriented Programming (OOP) Principles
+
+#### Encapsulation
+
+<Card title="Service Encapsulation" icon="shield">
+The `ConsultaMoneda` class encapsulates all API communication logic, hiding implementation details from the controller.
+
+```java
+// Instance-based design (not static)
+ConsultaMoneda consulta = new ConsultaMoneda();
+double resultado = consulta.obtenerTasa(base, objetivo, cantidad);
+```
+</Card>
+
+#### Single Responsibility Principle (SRP)
+
+Each class has a single, well-defined responsibility:
+
+- **ConversorApp**: Application orchestration and flow control
+- **ConsultaMoneda**: External API communication
+- **RegistroConversion**: Data representation
+- **Conversor**: User interface presentation
+
+#### Immutability
+
+<Card title="Java Records" icon="lock">
+The `RegistroConversion` record provides immutable data structures, ensuring thread safety and preventing accidental modifications.
+
+```java
+public record RegistroConversion(
+    String monedaBase,
+    String monedaObjetivo,
+    double cantidad,
+    double resultado,
+    LocalDateTime fechaHora
+) { }
+```
+</Card>
+
+### Modern Java Features
+
+The application leverages several modern Java features:
+
+<CardGroup cols={2}>
+  <Card title="Records (Java 14+)" icon="database">
+    Immutable data carriers with automatic constructors, getters, `equals()`, `hashCode()`, and `toString()`
+  </Card>
+  <Card title="Text Blocks (Java 13+)" icon="align-left">
+    Multi-line string literals for cleaner menu formatting
+  </Card>
+  <Card title="Switch Expressions (Java 14+)" icon="code-branch">
+    Enhanced switch with `yield` for cleaner conditional logic
+  </Card>
+  <Card title="Lambda Expressions (Java 8+)" icon="function">
+    Functional programming for history display: `historial.forEach(System.out::println)`
+  </Card>
+</CardGroup>
+
+## Data Flow
+
+1. **User Input**: User selects currency pair and enters amount
+2. **Controller Processing**: `ConversorApp` processes the selection using switch expressions
+3. **Service Call**: Controller invokes `ConsultaMoneda.obtenerTasa()`
+4. **API Request**: Service makes HTTP request to ExchangeRate-API
+5. **Response Parsing**: JSON response parsed using Gson
+6. **History Recording**: Conversion saved as `RegistroConversion` with timestamp
+7. **Result Display**: Converted amount displayed to user
+
+<Info>
+  The application maintains in-memory history using `ArrayList<RegistroConversion>`, which persists only during the application session.
+</Info>
+
+## Error Handling Strategy
+
+The application implements graceful error handling:
+
+- API failures return `0` with error message
+- Invalid menu selections prompt retry
+- Exception catching prevents application crashes
+
+```java
+try {
+    // API communication logic
+} catch (Exception e) {
+    System.out.println("Error al conectar con la API: " + e.getMessage());
+    return 0;
+}
+```
+
+<Warning>
+  The current implementation returns `0` on API errors, which could be confused with a legitimate conversion result. Consider using `Optional<Double>` or throwing custom exceptions for production applications.
+</Warning>

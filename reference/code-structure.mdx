@@ -1,0 +1,730 @@
+---
+title: 'Code Structure Reference'
+description: 'Detailed code reference for all classes, methods, and components'
+icon: 'code'
+---
+
+## Overview
+
+This page provides a comprehensive reference for all classes, methods, and code structures in the Currency Converter application.
+
+## ConversorApp (Main Controller)
+
+**Package:** `lad.com.alura.conversormoneda.controladores`
+
+**Purpose:** Application entry point and main controller that orchestrates the conversion flow.
+
+### Class Structure
+
+```java
+package lad.com.alura.conversormoneda.controladores;
+
+import lad.com.alura.conversormoneda.modelos.ConsultaMoneda;
+import lad.com.alura.conversormoneda.vista.Conversor;
+import lad.com.alura.conversormoneda.modelos.RegistroConversion;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class ConversorApp {
+    public static void main(String[] args) {
+        // Implementation
+    }
+}
+```
+
+### main() Method
+
+<ParamField path="args" type="String[]">
+  Command-line arguments (not used in current implementation)
+</ParamField>
+
+<ParamField path="returns" type="void">
+  No return value
+</ParamField>
+
+### Complete Implementation
+
+<Tabs>
+  <Tab title="Main Method">
+```java
+public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    // Instantiate service (OOP)
+    ConsultaMoneda consulta = new ConsultaMoneda();
+    // Create history list
+    List<RegistroConversion> historial = new ArrayList<>();
+
+    int opcion;
+
+    while (true) {
+        // Display menu
+        Conversor.eleccionUserMenu();
+        opcion = sc.nextInt();
+
+        if (opcion == 8) {
+            System.out.println("Gracias por usar el conversor.");
+            break;
+        }
+
+        if (opcion == 7) {
+            // Display history
+            System.out.println("\n--- HISTORIAL DE CONVERSIONES ---");
+            if (historial.isEmpty()) {
+                System.out.println("No hay conversiones recientes.");
+            } else {
+                historial.forEach(System.out::println); // Lambda!
+            }
+            System.out.println("---------------------------------\n");
+            continue;
+        }
+
+        if (opcion >= 1 && opcion <= 6) {
+            // Process conversion...
+        } else {
+            System.out.println("Opción no válida. Intente de nuevo.\n");
+        }
+    }
+    sc.close();
+}
+```
+  </Tab>
+  <Tab title="Currency Selection Logic">
+```java
+System.out.println("Ingrese el valor que desea convertir: ");
+double cantidad = sc.nextDouble();
+double resultado;
+String base = "", objetivo = "";
+
+// Assign currencies based on option
+objetivo = switch (opcion) {
+    case 1 -> {
+        base = "USD";
+        yield "ARS";
+    }
+    case 2 -> {
+        base = "ARS";
+        yield "USD";
+    }
+    case 3 -> {
+        base = "USD";
+        yield "BRL";
+    }
+    case 4 -> {
+        base = "BRL";
+        yield "USD";
+    }
+    case 5 -> {
+        base = "USD";
+        yield "COP";
+    }
+    case 6 -> {
+        base = "COP";
+        yield "USD";
+    }
+    default -> objetivo;
+};
+
+// Use the service to get the rate
+resultado = consulta.obtenerTasa(base, objetivo, cantidad);
+System.out.println("El valor es: " + resultado + " [" + objetivo + "]\n");
+
+// Save to history with current timestamp
+RegistroConversion registro = new RegistroConversion(
+    base, objetivo, cantidad, resultado, LocalDateTime.now()
+);
+historial.add(registro);
+```
+  </Tab>
+</Tabs>
+
+### Key Features
+
+<CardGroup cols={2}>
+  <Card title="Menu Options" icon="list">
+    - Options 1-6: Currency conversions
+    - Option 7: View history
+    - Option 8: Exit application
+  </Card>
+  <Card title="Data Structures" icon="database">
+    - `Scanner` for user input
+    - `ConsultaMoneda` service instance
+    - `List<RegistroConversion>` for history
+  </Card>
+  <Card title="Switch Expressions" icon="code-branch">
+    Uses Java 14+ switch expressions with `yield` for cleaner code
+  </Card>
+  <Card title="Lambda Functions" icon="function">
+    Uses method reference `System.out::println` for history display
+  </Card>
+</CardGroup>
+
+## ConsultaMoneda (Service Class)
+
+**Package:** `lad.com.alura.conversormoneda.modelos`
+
+**Purpose:** Service class responsible for communicating with ExchangeRate-API.
+
+### Class Definition
+
+```java
+package lad.com.alura.conversormoneda.modelos;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class ConsultaMoneda {
+    // Instance method (not static)
+    public double obtenerTasa(String monedaBase, 
+                             String monedaObjetivo, 
+                             double cantidad) {
+        // Implementation
+    }
+}
+```
+
+### obtenerTasa() Method Signature
+
+<ParamField path="monedaBase" type="String" required>
+  Source currency code (e.g., "USD", "ARS", "BRL")
+</ParamField>
+
+<ParamField path="monedaObjetivo" type="String" required>
+  Target currency code (e.g., "ARS", "BRL", "COP")
+</ParamField>
+
+<ParamField path="cantidad" type="double" required>
+  Amount to convert
+</ParamField>
+
+<ParamField path="returns" type="double">
+  Converted amount, or `0` if error occurs
+</ParamField>
+
+### Method Implementation Breakdown
+
+<Steps>
+  <Step title="Create HTTP Client">
+    ```java
+    HttpClient cliente = HttpClient.newHttpClient();
+    ```
+    
+    Creates a new HTTP client for making requests
+  </Step>
+  
+  <Step title="Build API URL">
+    ```java
+    String url = "https://v6.exchangerate-api.com/v6/9ba310889b4d07769a662fc0/pair/" 
+        + monedaBase + "/" + monedaObjetivo + "/" + cantidad;
+    ```
+    
+    Constructs the API endpoint with currency codes and amount
+  </Step>
+  
+  <Step title="Create HTTP Request">
+    ```java
+    HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .GET()
+            .build();
+    ```
+    
+    Builds an HTTP GET request
+  </Step>
+  
+  <Step title="Send Request">
+    ```java
+    HttpResponse<String> respuesta = cliente.send(
+        request, 
+        HttpResponse.BodyHandlers.ofString()
+    );
+    ```
+    
+    Sends the request and receives response as String
+  </Step>
+  
+  <Step title="Parse JSON">
+    ```java
+    JsonElement elemento = JsonParser.parseString(respuesta.body());
+    JsonObject objectRoot = elemento.getAsJsonObject();
+    ```
+    
+    Parses JSON response into JsonObject
+  </Step>
+  
+  <Step title="Extract Result">
+    ```java
+    return objectRoot.get("conversion_result").getAsDouble();
+    ```
+    
+    Extracts and returns the conversion result
+  </Step>
+  
+  <Step title="Handle Errors">
+    ```java
+    catch (Exception e) {
+        System.out.println("Error al conectar con la API: " + e.getMessage());
+        return 0;
+    }
+    ```
+    
+    Catches all exceptions and returns 0
+  </Step>
+</Steps>
+
+### Usage Example
+
+```java
+// Create service instance
+ConsultaMoneda consulta = new ConsultaMoneda();
+
+// Perform conversion
+double resultado = consulta.obtenerTasa("USD", "ARS", 100.0);
+
+// Display result
+System.out.println("100 USD = " + resultado + " ARS");
+```
+
+<Note>
+  The method is **not static**, following OOP principles. You must create an instance of `ConsultaMoneda` to use it.
+</Note>
+
+## RegistroConversion (Data Record)
+
+**Package:** `lad.com.alura.conversormoneda.modelos`
+
+**Purpose:** Immutable data structure to store conversion history entries.
+
+### Record Definition
+
+```java
+package lad.com.alura.conversormoneda.modelos;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public record RegistroConversion(
+    String monedaBase, 
+    String monedaObjetivo, 
+    double cantidad, 
+    double resultado, 
+    LocalDateTime fechaHora
+) {
+    @Override
+    public String toString() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        return "[" + fechaHora.format(formato) + "] " 
+            + cantidad + " " + monedaBase + " =>> " 
+            + resultado + " " + monedaObjetivo;
+    }
+}
+```
+
+### Record Components
+
+<ParamField path="monedaBase" type="String">
+  The base (source) currency code
+</ParamField>
+
+<ParamField path="monedaObjetivo" type="String">
+  The target (destination) currency code
+</ParamField>
+
+<ParamField path="cantidad" type="double">
+  The original amount in base currency
+</ParamField>
+
+<ParamField path="resultado" type="double">
+  The converted amount in target currency
+</ParamField>
+
+<ParamField path="fechaHora" type="LocalDateTime">
+  Timestamp when the conversion was performed
+</ParamField>
+
+### Java Records (Java 14+)
+
+<Card title="What are Records?" icon="book">
+  Records are a special kind of class introduced in Java 14 that provide:
+  
+  - Automatic constructor
+  - Automatic getters (component methods)
+  - Automatic `equals()` and `hashCode()`
+  - Automatic `toString()` (can be overridden)
+  - Immutability by default
+</Card>
+
+### Automatically Generated Methods
+
+<Tabs>
+  <Tab title="Constructor">
+```java
+// Automatically generated canonical constructor
+public RegistroConversion(
+    String monedaBase,
+    String monedaObjetivo,
+    double cantidad,
+    double resultado,
+    LocalDateTime fechaHora
+) {
+    // Fields are automatically assigned
+}
+```
+  </Tab>
+  <Tab title="Getters">
+```java
+// Component accessor methods (automatically generated)
+public String monedaBase() { return this.monedaBase; }
+public String monedaObjetivo() { return this.monedaObjetivo; }
+public double cantidad() { return this.cantidad; }
+public double resultado() { return this.resultado; }
+public LocalDateTime fechaHora() { return this.fechaHora; }
+```
+  </Tab>
+  <Tab title="equals & hashCode">
+```java
+// Automatically generated based on all components
+@Override
+public boolean equals(Object obj) {
+    // Compares all fields
+}
+
+@Override
+public int hashCode() {
+    // Hash based on all fields
+}
+```
+  </Tab>
+</Tabs>
+
+### Custom toString() Implementation
+
+The record overrides `toString()` to provide formatted output:
+
+```java
+@Override
+public String toString() {
+    DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    return "[" + fechaHora.format(formato) + "] " 
+        + cantidad + " " + monedaBase + " =>> " 
+        + resultado + " " + monedaObjetivo;
+}
+```
+
+**Example Output:**
+```
+[05-03-2026 14:30:45] 100.0 USD =>> 6323.41 ARS
+```
+
+### Usage Examples
+
+<CodeGroup>
+```java Creating Records
+// Create a new conversion record
+RegistroConversion registro = new RegistroConversion(
+    "USD",              // monedaBase
+    "ARS",              // monedaObjetivo
+    100.0,              // cantidad
+    6323.41,            // resultado
+    LocalDateTime.now() // fechaHora
+);
+```
+
+```java Accessing Components
+// Access record components using getter methods
+String base = registro.monedaBase();
+String target = registro.monedaObjetivo();
+double amount = registro.cantidad();
+double result = registro.resultado();
+LocalDateTime timestamp = registro.fechaHora();
+
+System.out.println("Converted " + amount + " " + base);
+```
+
+```java Storing in Collections
+// Records work perfectly in collections
+List<RegistroConversion> historial = new ArrayList<>();
+
+historial.add(new RegistroConversion(
+    "USD", "ARS", 100.0, 6323.41, LocalDateTime.now()
+));
+historial.add(new RegistroConversion(
+    "BRL", "USD", 50.0, 10.15, LocalDateTime.now()
+));
+
+// Display history using forEach and toString()
+historial.forEach(System.out::println);
+```
+</CodeGroup>
+
+## Conversor (View Class)
+
+**Package:** `lad.com.alura.conversormoneda.vista`
+
+**Purpose:** Handles user interface display and presentation logic.
+
+### Class Structure
+
+```java
+package lad.com.alura.conversormoneda.vista;
+
+public class Conversor {
+    public static void eleccionUserMenu() {
+        System.out.print("""
+                Sea bienvenido/a al Conversor de Moneda =]
+                
+                ==================================================
+                1) Dólar           =>> Peso argentino
+                2) Peso argentino  =>> Dólar
+                3) Dólar           =>> Real brasileño
+                4) Real brasileño  =>> Dólar
+                5) Dólar           =>> Peso colombiano
+                6) Peso colombiano =>> Dólar
+                7) Historial de conversiones
+                8) Salir
+                ==================================================
+                Elija una opción válida:
+                """);
+    }
+}
+```
+
+### eleccionUserMenu() Method
+
+<ParamField path="parameters" type="none">
+  No parameters required
+</ParamField>
+
+<ParamField path="returns" type="void">
+  No return value (displays menu to console)
+</ParamField>
+
+<ParamField path="access" type="public static">
+  Static method - can be called without creating an instance
+</ParamField>
+
+### Text Blocks (Java 13+)
+
+The method uses **text blocks** for multi-line string literals:
+
+<Tabs>
+  <Tab title="Text Block Syntax">
+    ```java
+    System.out.print("""
+        Multi-line
+        String
+        Content
+        """);
+    ```
+
+    **Benefits:**
+    
+    No need for `\n` newline characters, no need for string concatenation, preserves formatting and indentation, and more readable for large text blocks.
+  </Tab>
+  <Tab title="Traditional Syntax (Pre-Java 13)">
+    ```java
+    System.out.print(
+        "Sea bienvenido/a al Conversor de Moneda =]\n" +
+        "\n" +
+        "==================================================\n" +
+        "1) Dólar           =>> Peso argentino\n" +
+        "2) Peso argentino  =>> Dólar\n" +
+        // ... more lines
+    );
+    ```
+
+    **Drawbacks:**
+    
+    Requires `\n` for each line, requires `+` concatenation, less readable, and more error-prone.
+  </Tab>
+</Tabs>
+
+### Menu Options
+
+<CardGroup cols={2}>
+  <Card title="Option 1" icon="1">
+    USD → ARS (Dollar to Argentine Peso)
+  </Card>
+  <Card title="Option 2" icon="2">
+    ARS → USD (Argentine Peso to Dollar)
+  </Card>
+  <Card title="Option 3" icon="3">
+    USD → BRL (Dollar to Brazilian Real)
+  </Card>
+  <Card title="Option 4" icon="4">
+    BRL → USD (Brazilian Real to Dollar)
+  </Card>
+  <Card title="Option 5" icon="5">
+    USD → COP (Dollar to Colombian Peso)
+  </Card>
+  <Card title="Option 6" icon="6">
+    COP → USD (Colombian Peso to Dollar)
+  </Card>
+  <Card title="Option 7" icon="clock-rotate-left">
+    Display conversion history
+  </Card>
+  <Card title="Option 8" icon="right-from-bracket">
+    Exit the application
+  </Card>
+</CardGroup>
+
+### Usage
+
+```java
+// Call from controller
+Conversor.eleccionUserMenu();
+
+// User sees the menu and enters their choice
+int opcion = scanner.nextInt();
+```
+
+<Info>
+  The method uses `System.out.print()` (not `println()`) so the cursor remains on the same line as the prompt, providing a better user experience.
+</Info>
+
+## Method Signatures Summary
+
+<CardGroup cols={1}>
+  <Card title="ConversorApp.main()" icon="play">
+    ```java
+    public static void main(String[] args)
+    ```
+    
+    Application entry point - orchestrates the entire conversion flow
+  </Card>
+  
+  <Card title="ConsultaMoneda.obtenerTasa()" icon="globe">
+    ```java
+    public double obtenerTasa(String monedaBase, String monedaObjetivo, double cantidad)
+    ```
+    
+    Performs API request and returns converted amount
+  </Card>
+  
+  <Card title="RegistroConversion (Constructor)" icon="database">
+    ```java
+    public RegistroConversion(String monedaBase, String monedaObjetivo, 
+                             double cantidad, double resultado, 
+                             LocalDateTime fechaHora)
+    ```
+    
+    Creates immutable conversion history record
+  </Card>
+  
+  <Card title="RegistroConversion.toString()" icon="text">
+    ```java
+    public String toString()
+    ```
+    
+    Returns formatted string representation of the conversion
+  </Card>
+  
+  <Card title="Conversor.eleccionUserMenu()" icon="bars">
+    ```java
+    public static void eleccionUserMenu()
+    ```
+    
+    Displays the main menu to the user
+  </Card>
+</CardGroup>
+
+## Modern Java Features Used
+
+<AccordionGroup>
+  <Accordion title="Records (Java 14+)" icon="database">
+    Used in `RegistroConversion` for immutable data carriers:
+    
+    ```java
+    public record RegistroConversion(
+        String monedaBase,
+        String monedaObjetivo,
+        double cantidad,
+        double resultado,
+        LocalDateTime fechaHora
+    ) { }
+    ```
+  </Accordion>
+  
+  <Accordion title="Text Blocks (Java 13+)" icon="align-left">
+    Used in `Conversor.eleccionUserMenu()` for multi-line strings:
+    
+    ```java
+    System.out.print("""
+        Multi-line
+        String
+        """);
+    ```
+  </Accordion>
+  
+  <Accordion title="Switch Expressions (Java 14+)" icon="code-branch">
+    Used in `ConversorApp.main()` for currency selection:
+    
+    ```java
+    objetivo = switch (opcion) {
+        case 1 -> {
+            base = "USD";
+            yield "ARS";
+        }
+        // ...
+    };
+    ```
+  </Accordion>
+  
+  <Accordion title="Lambda Expressions (Java 8+)" icon="function">
+    Used for history display:
+    
+    ```java
+    historial.forEach(System.out::println);
+    ```
+  </Accordion>
+  
+  <Accordion title="HttpClient (Java 11+)" icon="network-wired">
+    Modern HTTP client API:
+    
+    ```java
+    HttpClient cliente = HttpClient.newHttpClient();
+    HttpResponse<String> respuesta = cliente.send(request, 
+        HttpResponse.BodyHandlers.ofString());
+    ```
+  </Accordion>
+  
+  <Accordion title="var Keyword (Java 10+)" icon="code">
+    While not used in this codebase, could simplify local variable declarations:
+    
+    ```java
+    var consulta = new ConsultaMoneda();
+    var historial = new ArrayList<RegistroConversion>();
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  **Java Version Requirement**: This application requires **Java 14 or higher** due to the use of records and switch expressions with yield.
+</Warning>
+
+## Dependencies
+
+<Tabs>
+  <Tab title="Standard Library">
+    - `java.net.http.HttpClient` - HTTP communication
+    - `java.net.URI` - URL handling
+    - `java.time.LocalDateTime` - Timestamp management
+    - `java.time.format.DateTimeFormatter` - Date formatting
+    - `java.util.Scanner` - User input
+    - `java.util.ArrayList` - Dynamic list storage
+    - `java.util.List` - List interface
+  </Tab>
+  <Tab title="External Libraries">
+    - **Gson 2.10.1+** (com.google.code.gson)
+      - `JsonParser` - Parse JSON strings
+      - `JsonElement` - JSON element representation
+      - `JsonObject` - JSON object access
+  </Tab>
+</Tabs>

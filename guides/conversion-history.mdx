@@ -1,0 +1,174 @@
+---
+title: 'Conversion History'
+description: 'Track and review your currency conversion history with timestamps'
+icon: 'clock-rotate-left'
+---
+
+The Currency Converter automatically tracks all your conversions in a history log, allowing you to review past transactions with detailed timestamps.
+
+## Accessing History
+
+To view your conversion history:
+
+1. From the main menu, select option **7**
+2. The application displays all conversions made during the current session
+3. Press any key to return to the main menu
+
+```
+7) Historial de conversiones
+```
+
+<Info>
+History viewing is implemented in `ConversorApp.java:32-41` and uses Java streams with lambda expressions for efficient display
+</Info>
+
+## History Format
+
+Each conversion record follows this format:
+
+```
+[DD-MM-YYYY HH:mm:ss] AMOUNT BASE_CURRENCY =>> RESULT TARGET_CURRENCY
+```
+
+### Format Components
+
+<CardGroup cols={2}>
+  <Card title="Timestamp" icon="calendar">
+    Date and time when the conversion was performed, formatted as day-month-year with 24-hour time
+  </Card>
+  <Card title="Original Amount" icon="coins">
+    The amount you entered for conversion
+  </Card>
+  <Card title="Base Currency" icon="dollar-sign">
+    The currency you converted from (e.g., USD, ARS, BRL, COP)
+  </Card>
+  <Card title="Result" icon="arrow-right">
+    The converted amount in the target currency
+  </Card>
+</CardGroup>
+
+## Example History Output
+
+### With Conversions
+
+When you have performed conversions, the history displays:
+
+```
+--- HISTORIAL DE CONVERSIONES ---
+[05-03-2026 14:23:45] 100.0 USD =>> 35000.0 ARS
+[05-03-2026 14:25:12] 50.0 USD =>> 247.75 BRL
+[05-03-2026 14:27:33] 200.0 USD =>> 760000.0 COP
+[05-03-2026 14:29:01] 500.0 ARS =>> 1.43 USD
+---------------------------------
+```
+
+This shows four conversions performed during the session, each with its precise timestamp.
+
+### Empty History
+
+If no conversions have been performed yet, you'll see:
+
+```
+--- HISTORIAL DE CONVERSIONES ---
+No hay conversiones recientes.
+---------------------------------
+```
+
+<Note>
+Empty history check is handled in `ConversorApp.java:34-36`
+</Note>
+
+## RegistroConversion Record Structure
+
+History entries are stored using the `RegistroConversion` record class, which is a Java record type providing immutable data storage.
+
+### Record Fields
+
+```java
+record RegistroConversion(
+    String monedaBase,      // Base currency code (e.g., "USD")
+    String monedaObjetivo,  // Target currency code (e.g., "ARS")
+    double cantidad,        // Amount converted
+    double resultado,       // Conversion result
+    LocalDateTime fechaHora // Timestamp of conversion
+)
+```
+
+<Info>
+The `RegistroConversion` record is defined in `/workspace/source/src/lad/com/alura/conversormoneda/modelos/RegistroConversion.java:6`
+</Info>
+
+### Custom toString() Method
+
+The record overrides the `toString()` method to provide formatted output:
+
+```java
+@Override
+public String toString() {
+    DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    return "[" + fechaHora.format(formato) + "] " + cantidad + " " + 
+           monedaBase + " =>> " + resultado + " " + monedaObjetivo;
+}
+```
+
+This custom formatting ensures consistent, readable history output.
+
+<Note>
+Custom `toString()` implementation is in `RegistroConversion.java:9-13`
+</Note>
+
+## How History is Created
+
+After each successful conversion:
+
+1. A new `RegistroConversion` object is created with:
+   - Base currency code
+   - Target currency code
+   - Original amount
+   - Conversion result
+   - Current timestamp (`LocalDateTime.now()`)
+
+2. The record is added to the `historial` ArrayList
+
+3. The list persists for the entire session
+
+```java
+RegistroConversion registro = new RegistroConversion(
+    base, objetivo, cantidad, resultado, LocalDateTime.now()
+);
+historial.add(registro);
+```
+
+<Info>
+History creation happens in `ConversorApp.java:83-84` after each conversion
+</Info>
+
+## History Persistence
+
+<Note>
+The history is stored in memory using an `ArrayList<RegistroConversion>` and **persists only during the current application session**. When you exit the application (option 8), the history is cleared.
+</Note>
+
+The history list is initialized at application startup:
+
+```java
+List<RegistroConversion> historial = new ArrayList<>();
+```
+
+<Info>
+History list initialization is in `ConversorApp.java:18`
+</Info>
+
+## Using Lambda Expressions
+
+The history display uses Java's functional programming features:
+
+```java
+historial.forEach(System.out::println);
+```
+
+This lambda expression iterates through all records and prints each one using the custom `toString()` method, providing clean and efficient code.
+
+<Info>
+Lambda-based display is implemented in `ConversorApp.java:37`
+</Info>

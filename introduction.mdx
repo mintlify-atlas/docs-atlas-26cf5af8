@@ -1,0 +1,92 @@
+---
+title: Introduction
+description: Learn about the Currency Converter application and its key features
+---
+
+## What is Currency Converter?
+
+The Currency Converter is a Java-based console application that provides real-time currency exchange rates and conversions. Built as part of the Alura ONE Java Backend Challenge, it demonstrates object-oriented programming principles, HTTP API integration, and modern Java features.
+
+The application connects to the ExchangeRate-API to fetch live exchange rates and perform accurate currency conversions between multiple Latin American currencies and the US Dollar.
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Real-Time Exchange Rates" icon="chart-line">
+    Fetches current exchange rates from ExchangeRate-API for accurate conversions
+  </Card>
+  <Card title="Multiple Currency Pairs" icon="money-bill-transfer">
+    Support for USD, Argentine Peso (ARS), Brazilian Real (BRL), and Colombian Peso (COP)
+  </Card>
+  <Card title="Conversion History" icon="clock-rotate-left">
+    Track all your conversions with timestamps and detailed records
+  </Card>
+  <Card title="Interactive Menu" icon="terminal">
+    Easy-to-use console interface for quick currency conversions
+  </Card>
+</CardGroup>
+
+## Supported Currencies
+
+The Currency Converter currently supports the following currency pairs:
+
+- **USD** (United States Dollar) ⇄ **ARS** (Argentine Peso)
+- **USD** (United States Dollar) ⇄ **BRL** (Brazilian Real)
+- **USD** (United States Dollar) ⇄ **COP** (Colombian Peso)
+
+Each currency pair supports bidirectional conversion, allowing you to convert from USD to the target currency or vice versa.
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="International Business">
+    Calculate costs and revenues when dealing with Latin American markets. Get real-time exchange rates to make informed business decisions.
+  </Accordion>
+  
+  <Accordion title="Travel Planning">
+    Plan your budget when traveling between the United States and Latin American countries. Know exactly how much your money is worth in the local currency.
+  </Accordion>
+  
+  <Accordion title="Learning Project">
+    Study a practical example of Java development that demonstrates:
+    - HTTP client usage with `HttpClient` and `HttpRequest`
+    - JSON parsing with Gson library
+    - Object-oriented programming with packages and models
+    - Modern Java features like records, switch expressions, and lambdas
+    - Collection management with `ArrayList`
+  </Accordion>
+  
+  <Accordion title="Personal Finance">
+    Track exchange rates over time using the conversion history feature. Monitor how currency values fluctuate throughout the day.
+  </Accordion>
+</AccordionGroup>
+
+## Architecture Overview
+
+The application follows a clean MVC-inspired architecture:
+
+```
+src/lad/com/alura/conversormoneda/
+├── controladores/
+│   └── ConversorApp.java       # Main application controller
+├── modelos/
+│   ├── ConsultaMoneda.java     # API integration service
+│   └── RegistroConversion.java # Conversion record model
+└── vista/
+    └── Conversor.java          # User interface view
+```
+
+<Note>
+  The application uses **Gson 2.10.1** for JSON parsing and Java's built-in `HttpClient` for API requests, requiring Java 11 or higher.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up the Currency Converter on your system
+  </Card>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Perform your first currency conversion
+  </Card>
+</CardGroup>

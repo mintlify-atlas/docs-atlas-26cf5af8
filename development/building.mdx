@@ -1,0 +1,138 @@
+---
+title: Building the Application
+description: Learn how to compile and run the Currency Converter from source
+---
+
+This guide covers how to build and run the Currency Converter application from source code.
+
+## Prerequisites
+
+<Note>
+You need Java Development Kit (JDK) 17 or higher installed on your system.
+</Note>
+
+Verify your Java version:
+
+```bash
+java -version
+javac -version
+```
+
+## Project Structure
+
+The project follows a standard Java package structure:
+
+```
+source/
+├── lib/
+│   └── gson-2.10.1.jar          # JSON parsing library
+├── src/
+│   └── lad/com/alura/conversormoneda/
+│       ├── controladores/
+│       │   └── ConversorApp.java      # Main application entry point
+│       ├── modelos/
+│       │   ├── ConsultaMoneda.java    # API communication service
+│       │   └── RegistroConversion.java # Conversion history record
+│       └── vista/
+│           └── Conversor.java         # User interface menu
+```
+
+### Package Organization
+
+- **controladores**: Application controller and main entry point
+- **modelos**: Business logic and data models
+- **vista**: User interface components
+
+## Building from Source
+
+<Steps>
+
+### Navigate to project directory
+
+```bash
+cd source
+```
+
+### Compile the application
+
+Compile all Java source files with Gson in the classpath:
+
+```bash
+javac -cp "lib/gson-2.10.1.jar" -d out src/lad/com/alura/conversormoneda/**/*.java
+```
+
+This command:
+- `-cp "lib/gson-2.10.1.jar"` - Adds Gson library to classpath
+- `-d out` - Places compiled `.class` files in the `out` directory
+- `src/lad/com/alura/conversormoneda/**/*.java` - Compiles all Java files in the package
+
+### Verify compilation
+
+Check that the `out` directory was created with compiled classes:
+
+```bash
+ls -la out/lad/com/alura/conversormoneda/
+```
+
+</Steps>
+
+## Running the Application
+
+After successful compilation, run the application:
+
+```bash
+java -cp "out:lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+```
+
+<Tip>
+On Windows, use semicolon (`;`) instead of colon (`:`) as the classpath separator:
+```bash
+java -cp "out;lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+```
+</Tip>
+
+## Output Directory Structure
+
+After compilation, the `out` directory mirrors the package structure:
+
+```
+out/
+└── lad/
+    └── com/
+        └── alura/
+            └── conversormoneda/
+                ├── controladores/
+                │   └── ConversorApp.class
+                ├── modelos/
+                │   ├── ConsultaMoneda.class
+                │   └── RegistroConversion.class
+                └── vista/
+                    └── Conversor.class
+```
+
+## Cleaning Build Files
+
+To remove compiled classes and start fresh:
+
+```bash
+rm -rf out
+```
+
+## Troubleshooting
+
+### ClassNotFoundException
+
+If you see `ClassNotFoundException` for Gson classes, ensure:
+- The `lib/gson-2.10.1.jar` file exists
+- You included `-cp "lib/gson-2.10.1.jar"` during compilation
+- You included both `out` and `lib/gson-2.10.1.jar` in the classpath when running
+
+### Package Does Not Exist
+
+If compilation fails with "package does not exist" errors:
+- Verify all source files are in the correct package directories
+- Check that package declarations match the directory structure
+
+### Wrong Java Version
+
+The application uses modern Java features (records, text blocks, switch expressions). Ensure you're using JDK 17+.

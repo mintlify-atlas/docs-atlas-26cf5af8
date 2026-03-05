@@ -1,0 +1,305 @@
+---
+title: Contributing Guide
+description: Learn how to contribute to the Currency Converter project
+---
+
+We welcome contributions to improve the Currency Converter! This guide will help you set up your development environment and understand the contribution workflow.
+
+## Development Setup
+
+<Steps>
+
+### Clone the repository
+
+```bash
+git clone <repository-url>
+cd source
+```
+
+### Verify Java installation
+
+Ensure you have JDK 17 or higher:
+
+```bash
+java -version
+javac -version
+```
+
+### Verify dependencies
+
+Check that Gson library is present:
+
+```bash
+ls -lh lib/gson-2.10.1.jar
+```
+
+### Compile and test
+
+Compile the project to ensure everything works:
+
+```bash
+javac -cp "lib/gson-2.10.1.jar" -d out src/lad/com/alura/conversormoneda/**/*.java
+java -cp "out:lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+```
+
+</Steps>
+
+## Code Style Guidelines
+
+Based on the existing codebase, follow these conventions:
+
+### Package Naming
+
+- Use lowercase: `lad.com.alura.conversormoneda`
+- Organize by layer: `controladores`, `modelos`, `vista`
+
+### Class Naming
+
+- PascalCase for classes: `ConversorApp`, `ConsultaMoneda`
+- Descriptive names that reflect purpose
+- Spanish variable names (project convention): `monedaBase`, `cantidad`, `resultado`
+
+### Code Organization
+
+```java
+// 1. Package declaration
+package lad.com.alura.conversormoneda.modelos;
+
+// 2. Imports (grouped)
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+// 3. Class declaration
+public class ClassName {
+    // Fields
+    // Constructors
+    // Methods
+}
+```
+
+### Indentation and Formatting
+
+- **Indentation**: 4 spaces (no tabs)
+- **Braces**: Opening brace on same line
+- **Spacing**: Space after keywords (`if`, `for`, `while`)
+
+### Modern Java Features
+
+The codebase uses modern Java features:
+
+- **Records**: For immutable data classes (see `RegistroConversion.java:6`)
+- **Text blocks**: For multi-line strings (see `Conversor.java:4-18`)
+- **Switch expressions**: With `yield` keyword (see `ConversorApp.java:50-76`)
+- **Lambda expressions**: For stream operations (see `ConversorApp.java:37`)
+
+<Tip>
+When adding new features, prefer modern Java idioms over legacy patterns.
+</Tip>
+
+## Adding New Currency Pairs
+
+To add support for additional currency conversions:
+
+<Steps>
+
+### Update the menu
+
+Edit `src/lad/com/alura/conversormoneda/vista/Conversor.java:4-18`
+
+Add new menu options:
+
+```java
+public static void eleccionUserMenu() {
+    System.out.print("""
+            Sea bienvenido/a al Conversor de Moneda =]
+            
+            ==================================================
+            1) Dólar           =>> Peso argentino
+            2) Peso argentino  =>> Dólar
+            // ... existing options ...
+            9) Dólar           =>> Euro  // New option
+            10) Euro           =>> Dólar // New option
+            ==================================================
+            Elija una opción válida:
+            """);
+}
+```
+
+### Add switch case logic
+
+Edit `src/lad/com/alura/conversormoneda/controladores/ConversorApp.java:50-76`
+
+Add new cases to the switch expression:
+
+```java
+objetivo = switch (opcion) {
+    // ... existing cases ...
+    case 9 -> {
+        base = "USD";
+        yield "EUR";
+    }
+    case 10 -> {
+        base = "EUR";
+        yield "USD";
+    }
+    default -> objetivo;
+};
+```
+
+### Update conditional check
+
+Edit `src/lad/com/alura/conversormoneda/controladores/ConversorApp.java:43`
+
+Update the range check to include new options:
+
+```java
+if (opcion >= 1 && opcion <= 10) { // Updated from 6 to 10
+    // ...
+}
+```
+
+### Update exit option
+
+If adding multiple options, update the exit option number:
+
+```java
+if (opcion == 11) { // Updated from 8 to 11
+    System.out.println("Gracias por usar el conversor.");
+    break;
+}
+```
+
+Similarly, update the history option number if needed.
+
+</Steps>
+
+<Note>
+The `ConsultaMoneda` class (see `ConsultaMoneda.java:14`) already supports any valid currency pair through the ExchangeRate-API. You only need to update the menu and switch logic.
+</Note>
+
+## Testing Conversions
+
+Before submitting changes, test your modifications:
+
+<Steps>
+
+### Compile with changes
+
+```bash
+javac -cp "lib/gson-2.10.1.jar" -d out src/lad/com/alura/conversormoneda/**/*.java
+```
+
+### Run the application
+
+```bash
+java -cp "out:lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+```
+
+### Test each new currency pair
+
+- Select your new menu option
+- Enter a test amount (e.g., 100)
+- Verify the conversion returns a reasonable result
+- Check that the conversion appears in history (option 7)
+
+### Test edge cases
+
+- Enter invalid menu options
+- Enter zero or negative amounts
+- Test with very large numbers
+- Verify error handling for API failures
+
+</Steps>
+
+## Submitting Changes
+
+<Steps>
+
+### Create a feature branch
+
+```bash
+git checkout -b feature/add-eur-support
+```
+
+### Make your changes
+
+Edit the necessary files following the code style guidelines.
+
+### Test thoroughly
+
+Run the application and test all functionality.
+
+### Commit your changes
+
+```bash
+git add .
+git commit -m "Add EUR/USD currency pair support"
+```
+
+### Push to repository
+
+```bash
+git push origin feature/add-eur-support
+```
+
+### Create a pull request
+
+Submit a pull request with:
+- Clear description of changes
+- List of currency pairs added
+- Screenshots or test results
+
+</Steps>
+
+## Enhancement Ideas
+
+Consider these potential improvements:
+
+### Code Enhancements
+
+- Extract API key to configuration file or environment variable
+- Add input validation for amounts
+- Implement error handling for network failures
+- Add unit tests for `ConsultaMoneda` class
+- Support custom currency pair input
+
+### Feature Additions
+
+- Save history to file
+- Display historical trends
+- Add currency symbols
+- Support batch conversions
+- Add favorite currency pairs
+
+### Architecture Improvements
+
+- Separate concerns more clearly
+- Add configuration management
+- Implement dependency injection
+- Add logging framework
+- Migrate to Maven/Gradle for dependency management
+
+<Tip>
+Start with small, focused changes. It's easier to review and merge smaller pull requests.
+</Tip>
+
+## Getting Help
+
+If you encounter issues:
+
+- Review the [Building](/development/building) guide for compilation help
+- Check the [Dependencies](/development/dependencies) page for library information
+- Examine the existing code for examples
+- Test with the working currency pairs first
+
+## Code Review Process
+
+Pull requests will be reviewed for:
+
+- **Functionality**: Does it work as intended?
+- **Code style**: Follows existing conventions?
+- **Testing**: Has it been tested thoroughly?
+- **Documentation**: Are comments clear and helpful?
+- **Compatibility**: Works with JDK 17+?
+
+Thank you for contributing to the Currency Converter project!

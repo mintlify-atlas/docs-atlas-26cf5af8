@@ -1,97 +1,173 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Currency Converter Documentation"
+description: "Real-time currency conversion with Java"
+mode: "custom"
 ---
 
-## Setting up
+<div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 dark:from-[#059669] dark:via-[#047857] dark:to-[#065f46] py-20">
+  <div className="max-w-6xl mx-auto px-6">
+    <div className="grid lg:grid-cols-12 gap-8 items-center">
+      <div className="lg:col-span-7">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+          Currency Converter
+        </h1>
+        <p className="text-lg sm:text-xl text-emerald-50 dark:text-emerald-100 max-w-2xl mb-8">
+          A Java-based command-line tool that provides real-time currency conversion between USD, Argentine Peso, Brazilian Real, and Colombian Peso using live exchange rates.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <a 
+            href="/quickstart"
+            className="inline-flex items-center px-6 py-3 bg-white dark:bg-white text-emerald-700 dark:text-emerald-700 rounded-lg font-semibold hover:bg-emerald-50 dark:hover:bg-gray-100 transition-colors"
+          >
+            Get Started
+          </a>
+          <a 
+            href="/installation"
+            className="inline-flex items-center px-6 py-3 border-2 border-white/40 dark:border-white/40 bg-white/10 dark:bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 dark:hover:bg-white/20 transition-colors"
+          >
+            Installation Guide
+          </a>
+        </div>
+      </div>
+      <div className="lg:col-span-5 flex justify-center">
+        <div className="bg-white/10 dark:bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 dark:border-white/20">
+          <div className="text-emerald-50 dark:text-emerald-100 font-mono text-sm space-y-2">
+            <div className="text-emerald-200 dark:text-emerald-200">$ java ConversorApp</div>
+            <div className="pl-4">1) USD → ARS</div>
+            <div className="pl-4">2) ARS → USD</div>
+            <div className="pl-4">3) USD → BRL</div>
+            <div className="pl-4">4) BRL → USD</div>
+            <div className="pl-4 text-emerald-300 dark:text-emerald-300">7) History</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="text-center mb-12">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Quick Start</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400">Get up and running in three simple steps</p>
+  </div>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+  <Steps>
+    <Step title="Clone and compile the project">
+      Clone the repository and compile the Java source files with the Gson dependency.
+      
+      ```bash Terminal
+      git clone https://github.com/crespitosoff/Conversor_de_Moneda_Challenge_ONE_Java_Backend.git
+      cd Conversor_de_Moneda_Challenge_ONE_Java_Backend
+      javac -cp "lib/gson-2.10.1.jar" -d out src/lad/com/alura/conversormoneda/**/*.java
+      ```
+    </Step>
 
-## Make it yours
+    <Step title="Run the converter">
+      Launch the interactive menu to start converting currencies.
+      
+      ```bash Terminal
+      java -cp "out:lib/gson-2.10.1.jar" lad.com.alura.conversormoneda.controladores.ConversorApp
+      ```
+      
+      <Note>
+        The application will display an interactive menu with conversion options and history tracking.
+      </Note>
+    </Step>
 
-Design a docs site that looks great and empowers your users.
+    <Step title="Select a conversion">
+      Choose from six conversion pairs or view your conversion history.
+      
+      <Accordion title="Example conversion">
+        ```
+        Elija una opción válida: 1
+        Ingrese el valor que desea convertir: 100
+        El valor es: 9850.0 [ARS]
+        ```
+      </Accordion>
+    </Step>
+  </Steps>
+</div>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="mb-8">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Explore by Topic</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400">Everything you need to use and understand the Currency Converter</p>
+  </div>
+
+  <CardGroup cols={2}>
     <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+      title="Using the Converter"
+      icon="money-bill-transfer"
+      href="/guides/using-converter"
+    >
+      Learn how to perform currency conversions with the interactive menu interface
+    </Card>
+    <Card
+      title="Conversion History"
+      icon="clock-rotate-left"
+      href="/guides/conversion-history"
+    >
+      Track and view your conversion history with timestamps
+    </Card>
+    <Card
+      title="Supported Currencies"
+      icon="coins"
+      href="/guides/supported-currencies"
+    >
+      Explore the supported currency pairs and exchange rates
+    </Card>
+    <Card
+      title="Architecture"
+      icon="diagram-project"
+      href="/reference/architecture"
+    >
+      Understand the MVC pattern and object-oriented design
+    </Card>
+  </CardGroup>
+</div>
 
-## Create beautiful pages
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="mb-8">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Technical Resources</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400">Deep dive into the technical implementation</p>
+  </div>
 
-Everything you need to create world-class documentation.
+  <CardGroup cols={3}>
+    <Card
+      title="API Integration"
+      icon="plug"
+      href="/reference/api-integration"
+    >
+      How the ExchangeRate-API integration works
+    </Card>
+    <Card
+      title="Code Structure"
+      icon="code"
+      href="/reference/code-structure"
+    >
+      Explore the package structure and classes
+    </Card>
+    <Card
+      title="Building"
+      icon="hammer"
+      href="/development/building"
+    >
+      Compile and run the project locally
+    </Card>
+  </CardGroup>
+</div>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<div className="mt-20 mb-16 max-w-5xl mx-auto px-6">
+  <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 dark:from-emerald-700 dark:to-emerald-800 rounded-2xl p-8 sm:p-12 text-center border border-emerald-400/20 dark:border-emerald-600/20">
+    <h2 className="text-3xl font-bold text-white mb-4">Ready to start converting?</h2>
+    <p className="text-emerald-50 dark:text-emerald-100 text-lg mb-8 max-w-2xl mx-auto">
+      Follow the quickstart guide to get the Currency Converter running in minutes
+    </p>
+    <a 
+      href="/quickstart"
+      className="inline-flex items-center px-8 py-4 bg-white dark:bg-white text-emerald-700 dark:text-emerald-700 rounded-lg font-semibold hover:bg-emerald-50 dark:hover:bg-gray-100 transition-colors text-lg"
+    >
+      Get Started Now
+    </a>
+  </div>
+</div>

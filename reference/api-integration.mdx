@@ -1,0 +1,438 @@
+---
+title: 'ExchangeRate-API Integration'
+description: 'Complete guide to the ExchangeRate-API integration and HTTP client implementation'
+icon: 'globe'
+---
+
+## Overview
+
+The Currency Converter integrates with [ExchangeRate-API](https://www.exchangerate-api.com/) to retrieve real-time currency conversion rates. The integration is implemented in the `ConsultaMoneda` service class using Java's modern HTTP client.
+
+## ConsultaMoneda Service Class
+
+### Class Definition
+
+**Package:** `lad.com.alura.conversormoneda.modelos`
+
+```java
+public class ConsultaMoneda {
+    public double obtenerTasa(String monedaBase, 
+                             String monedaObjetivo, 
+                             double cantidad) {
+        // Implementation
+    }
+}
+```
+
+### obtenerTasa() Method
+
+The core method that performs currency conversion by calling the ExchangeRate-API.
+
+<ParamField path="monedaBase" type="String" required>
+  The source currency code in ISO 4217 format (e.g., "USD", "EUR", "ARS")
+</ParamField>
+
+<ParamField path="monedaObjetivo" type="String" required>
+  The target currency code in ISO 4217 format (e.g., "ARS", "BRL", "COP")
+</ParamField>
+
+<ParamField path="cantidad" type="double" required>
+  The amount to convert from the base currency
+</ParamField>
+
+<ParamField path="returns" type="double">
+  The converted amount in the target currency, or `0` if an error occurs
+</ParamField>
+
+### Complete Implementation
+
+<CodeGroup>
+```java Full Implementation
+public class ConsultaMoneda {
+
+    // Instance method (not static) - follows OOP principles
+    public double obtenerTasa(String monedaBase, String monedaObjetivo, double cantidad) {
+        try {
+            // Create HTTP client
+            HttpClient cliente = HttpClient.newHttpClient();
+            
+            // Build API URL
+            String url = "https://v6.exchangerate-api.com/v6/9ba310889b4d07769a662fc0/pair/" 
+                + monedaBase + "/" + monedaObjetivo + "/" + cantidad;
+
+            // Build HTTP request
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            // Send request and receive response
+            HttpResponse<String> respuesta = cliente.send(request, 
+                HttpResponse.BodyHandlers.ofString());
+
+            // Parse JSON response
+            JsonElement elemento = JsonParser.parseString(respuesta.body());
+            JsonObject objectRoot = elemento.getAsJsonObject();
+
+            // Extract conversion result
+            return objectRoot.get("conversion_result").getAsDouble();
+
+        } catch (Exception e) {
+            System.out.println("Error al conectar con la API: " + e.getMessage());
+            return 0;
+        }
+    }
+}
+```
+
+```java Usage Example
+// Create service instance
+ConsultaMoneda consulta = new ConsultaMoneda();
+
+// Convert 100 USD to ARS
+double resultado = consulta.obtenerTasa("USD", "ARS", 100.0);
+System.out.println("100 USD = " + resultado + " ARS");
+
+// Convert 50 BRL to USD
+resultado = consulta.obtenerTasa("BRL", "USD", 50.0);
+System.out.println("50 BRL = " + resultado + " USD");
+```
+</CodeGroup>
+
+## API Endpoint Structure
+
+### Endpoint Format
+
+```
+https://v6.exchangerate-api.com/v6/{api_key}/pair/{base}/{target}/{amount}
+```
+
+<ParamField path="api_key" type="string" required>
+  Your ExchangeRate-API key. The application uses a hardcoded key: `9ba310889b4d07769a662fc0`
+</ParamField>
+
+<ParamField path="base" type="string" required>
+  Three-letter ISO 4217 currency code for the base currency
+</ParamField>
+
+<ParamField path="target" type="string" required>
+  Three-letter ISO 4217 currency code for the target currency
+</ParamField>
+
+<ParamField path="amount" type="number" required>
+  The amount in the base currency to convert
+</ParamField>
+
+### Example API Calls
+
+<Tabs>
+  <Tab title="USD to ARS">
+    ```bash
+    GET https://v6.exchangerate-api.com/v6/9ba310889b4d07769a662fc0/pair/USD/ARS/100
+    ```
+    
+    Converts 100 US Dollars to Argentine Pesos
+  </Tab>
+  <Tab title="BRL to USD">
+    ```bash
+    GET https://v6.exchangerate-api.com/v6/9ba310889b4d07769a662fc0/pair/BRL/USD/50
+    ```
+    
+    Converts 50 Brazilian Reais to US Dollars
+  </Tab>
+  <Tab title="COP to USD">
+    ```bash
+    GET https://v6.exchangerate-api.com/v6/9ba310889b4d07769a662fc0/pair/COP/USD/1000
+    ```
+    
+    Converts 1000 Colombian Pesos to US Dollars
+  </Tab>
+</Tabs>
+
+## HttpClient Usage
+
+The application uses Java 11's modern `HttpClient` API for HTTP communication.
+
+### HTTP Client Creation
+
+```java
+HttpClient cliente = HttpClient.newHttpClient();
+```
+
+<Info>
+  `HttpClient.newHttpClient()` creates a new client with default configuration. For production applications, consider reusing a single client instance for better performance.
+</Info>
+
+### Building HTTP Requests
+
+```java
+HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(url))  // Set the target URI
+        .GET()                  // Set HTTP method to GET
+        .build();               // Build the request
+```
+
+<Card title="Builder Pattern" icon="hammer">
+  The `HttpRequest.Builder` uses the builder pattern for fluent, readable request configuration.
+</Card>
+
+### Sending Requests
+
+```java
+HttpResponse<String> respuesta = cliente.send(
+    request, 
+    HttpResponse.BodyHandlers.ofString()
+);
+```
+
+<ParamField path="request" type="HttpRequest">
+  The HTTP request to send
+</ParamField>
+
+<ParamField path="bodyHandler" type="BodyHandler<String>">
+  Specifies how to handle the response body. `ofString()` converts the response to a String
+</ParamField>
+
+## JSON Parsing with Gson
+
+The application uses the [Gson](https://github.com/google/gson) library to parse JSON responses from the API.
+
+### API Response Format
+
+```json
+{
+  "result": "success",
+  "documentation": "https://www.exchangerate-api.com/docs",
+  "terms_of_use": "https://www.exchangerate-api.com/terms",
+  "time_last_update_unix": 1585267200,
+  "time_last_update_utc": "Fri, 27 Mar 2020 00:00:00 +0000",
+  "time_next_update_unix": 1585353700,
+  "time_next_update_utc": "Sat, 28 Mar 2020 00:00:00 +0000",
+  "base_code": "USD",
+  "target_code": "ARS",
+  "conversion_rate": 63.2341,
+  "conversion_result": 6323.41
+}
+```
+
+### Parsing Implementation
+
+<Steps>
+  <Step title="Parse JSON String">
+    ```java
+    JsonElement elemento = JsonParser.parseString(respuesta.body());
+    ```
+    
+    Converts the raw JSON string into a `JsonElement` object
+  </Step>
+  
+  <Step title="Convert to JsonObject">
+    ```java
+    JsonObject objectRoot = elemento.getAsJsonObject();
+    ```
+    
+    Casts the element to a `JsonObject` for property access
+  </Step>
+  
+  <Step title="Extract Conversion Result">
+    ```java
+    return objectRoot.get("conversion_result").getAsDouble();
+    ```
+    
+    Retrieves the `conversion_result` field and converts it to a double
+  </Step>
+</Steps>
+
+### Key JSON Fields
+
+<CardGroup cols={2}>
+  <Card title="result" icon="circle-check">
+    Status of the API call: `"success"` or `"error"`
+  </Card>
+  <Card title="base_code" icon="dollar-sign">
+    The base currency code requested
+  </Card>
+  <Card title="target_code" icon="money-bill">
+    The target currency code requested
+  </Card>
+  <Card title="conversion_result" icon="calculator">
+    **The final converted amount** - this is what the application returns
+  </Card>
+</CardGroup>
+
+## Error Handling
+
+The implementation includes comprehensive error handling for network and parsing issues.
+
+### Try-Catch Block
+
+```java
+try {
+    // HTTP request and JSON parsing logic
+} catch (Exception e) {
+    System.out.println("Error al conectar con la API: " + e.getMessage());
+    return 0;
+}
+```
+
+### Common Error Scenarios
+
+<AccordionGroup>
+  <Accordion title="Network Connection Failure">
+    **Exception Type**: `IOException`
+    
+    Occurs when:
+    - No internet connection
+    - DNS resolution fails
+    - Firewall blocks the request
+    
+    **Handling**: Returns `0` and prints error message
+  </Accordion>
+  
+  <Accordion title="Invalid JSON Response">
+    **Exception Type**: `JsonParseException`
+    
+    Occurs when:
+    - API returns malformed JSON
+    - Response format changes
+    - Server error response
+    
+    **Handling**: Returns `0` and prints error message
+  </Accordion>
+  
+  <Accordion title="Missing JSON Field">
+    **Exception Type**: `NullPointerException`
+    
+    Occurs when:
+    - `conversion_result` field is missing
+    - API returns error response
+    
+    **Handling**: Returns `0` and prints error message
+  </Accordion>
+  
+  <Accordion title="HTTP Request Failure">
+    **Exception Type**: `InterruptedException`
+    
+    Occurs when:
+    - Request thread is interrupted
+    - Request times out
+    
+    **Handling**: Returns `0` and prints error message
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  **Production Consideration**: Returning `0` on error could be confused with a legitimate conversion result. Consider:
+  - Using `Optional<Double>` to represent success/failure
+  - Throwing custom exceptions (e.g., `ApiConnectionException`)
+  - Logging errors to a file instead of just console output
+</Warning>
+
+## Dependencies
+
+The API integration requires the following Java dependencies:
+
+<CodeGroup>
+```xml Maven (pom.xml)
+<dependencies>
+    <!-- Gson for JSON parsing -->
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.10.1</version>
+    </dependency>
+</dependencies>
+```
+
+```gradle Gradle (build.gradle)
+dependencies {
+    // Gson for JSON parsing
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
+```
+</CodeGroup>
+
+<Note>
+  The `java.net.http.HttpClient` is part of the Java 11+ standard library and requires no external dependencies.
+</Note>
+
+## API Rate Limits
+
+ExchangeRate-API has the following rate limits:
+
+<CardGroup cols={2}>
+  <Card title="Free Plan" icon="gift">
+    1,500 requests per month
+  </Card>
+  <Card title="Response Time" icon="clock">
+    Typically under 100ms
+  </Card>
+</CardGroup>
+
+<Tip>
+  For production applications with higher traffic, consider:
+  - Caching conversion rates for a few minutes
+  - Implementing retry logic with exponential backoff
+  - Upgrading to a paid API plan
+</Tip>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Externalize API Keys" icon="key">
+    The API key is currently hardcoded. For production:
+    
+    ```java
+    // Use environment variables
+    String apiKey = System.getenv("EXCHANGE_RATE_API_KEY");
+    String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/...";
+    ```
+    
+    Or use a properties file:
+    
+    ```java
+    Properties props = new Properties();
+    props.load(new FileInputStream("config.properties"));
+    String apiKey = props.getProperty("api.key");
+    ```
+  </Accordion>
+  
+  <Accordion title="Reuse HttpClient" icon="recycle">
+    Create a single `HttpClient` instance and reuse it:
+    
+    ```java
+    public class ConsultaMoneda {
+        private final HttpClient cliente = HttpClient.newHttpClient();
+        
+        public double obtenerTasa(String base, String target, double amount) {
+            // Use this.cliente instead of creating new one
+        }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Add Request Timeout" icon="hourglass">
+    Prevent hanging requests:
+    
+    ```java
+    HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .GET()
+            .timeout(Duration.ofSeconds(10))
+            .build();
+    ```
+  </Accordion>
+  
+  <Accordion title="Validate Currency Codes" icon="check">
+    Validate currency codes before making API calls:
+    
+    ```java
+    private static final Set<String> VALID_CURRENCIES = 
+        Set.of("USD", "ARS", "BRL", "COP", "EUR", "GBP");
+    
+    if (!VALID_CURRENCIES.contains(monedaBase)) {
+        throw new IllegalArgumentException("Invalid base currency");
+    }
+    ```
+  </Accordion>
+</AccordionGroup>

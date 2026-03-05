@@ -1,0 +1,253 @@
+---
+title: 'Supported Currencies'
+description: 'Complete list of currency pairs and exchange rate information'
+icon: 'money-bill-wave'
+---
+
+The Currency Converter supports bidirectional conversions between US Dollars and three major Latin American currencies, providing real-time exchange rates for accurate conversions.
+
+## Available Currency Pairs
+
+The application supports **6 conversion options** across **3 currency pairs**:
+
+<CardGroup cols={2}>
+  <Card title="USD ↔ ARS" icon="arrow-right-arrow-left">
+    United States Dollar and Argentine Peso
+  </Card>
+  <Card title="USD ↔ BRL" icon="arrow-right-arrow-left">
+    United States Dollar and Brazilian Real
+  </Card>
+  <Card title="USD ↔ COP" icon="arrow-right-arrow-left">
+    United States Dollar and Colombian Peso
+  </Card>
+</CardGroup>
+
+## Currency Details
+
+### USD ↔ ARS (Argentine Peso)
+
+<Accordion title="Option 1: USD to ARS">
+  **From**: United States Dollar (USD)  
+  **To**: Argentine Peso (ARS)
+  
+  Convert US Dollars to Argentine Pesos using current market rates.
+  
+  ```java
+  case 1 -> {
+      base = "USD";
+      yield "ARS";
+  }
+  ```
+  
+  <Info>Implementation: `ConversorApp.java:51-54`</Info>
+</Accordion>
+
+<Accordion title="Option 2: ARS to USD">
+  **From**: Argentine Peso (ARS)  
+  **To**: United States Dollar (USD)
+  
+  Convert Argentine Pesos back to US Dollars.
+  
+  ```java
+  case 2 -> {
+      base = "ARS";
+      yield "USD";
+  }
+  ```
+  
+  <Info>Implementation: `ConversorApp.java:55-58`</Info>
+</Accordion>
+
+### USD ↔ BRL (Brazilian Real)
+
+<Accordion title="Option 3: USD to BRL">
+  **From**: United States Dollar (USD)  
+  **To**: Brazilian Real (BRL)
+  
+  Convert US Dollars to Brazilian Reais using current market rates.
+  
+  ```java
+  case 3 -> {
+      base = "USD";
+      yield "BRL";
+  }
+  ```
+  
+  <Info>Implementation: `ConversorApp.java:59-62`</Info>
+</Accordion>
+
+<Accordion title="Option 4: BRL to USD">
+  **From**: Brazilian Real (BRL)  
+  **To**: United States Dollar (USD)
+  
+  Convert Brazilian Reais back to US Dollars.
+  
+  ```java
+  case 4 -> {
+      base = "BRL";
+      yield "USD";
+  }
+  ```
+  
+  <Info>Implementation: `ConversorApp.java:63-66`</Info>
+</Accordion>
+
+### USD ↔ COP (Colombian Peso)
+
+<Accordion title="Option 5: USD to COP">
+  **From**: United States Dollar (USD)  
+  **To**: Colombian Peso (COP)
+  
+  Convert US Dollars to Colombian Pesos using current market rates.
+  
+  ```java
+  case 5 -> {
+      base = "USD";
+      yield "COP";
+  }
+  ```
+  
+  <Info>Implementation: `ConversorApp.java:67-70`</Info>
+</Accordion>
+
+<Accordion title="Option 6: COP to USD">
+  **From**: Colombian Peso (COP)  
+  **To**: United States Dollar (USD)
+  
+  Convert Colombian Pesos back to US Dollars.
+  
+  ```java
+  case 6 -> {
+      base = "COP";
+      yield "USD";
+  }
+  ```
+  
+  <Info>Implementation: `ConversorApp.java:71-74`</Info>
+</Accordion>
+
+## Exchange Rate Source
+
+The Currency Converter uses **ExchangeRate-API** (v6) to fetch real-time exchange rates for all conversions.
+
+### API Integration
+
+The application makes HTTP requests to the ExchangeRate-API endpoint:
+
+```java
+String url = "https://v6.exchangerate-api.com/v6/9ba310889b4d07769a662fc0/pair/" 
+           + monedaBase + "/" + monedaObjetivo + "/" + cantidad;
+```
+
+<Info>
+API integration is implemented in `ConsultaMoneda.java:17`
+</Info>
+
+### API Response
+
+The API returns a JSON response containing the conversion result:
+
+```json
+{
+  "result": "success",
+  "documentation": "https://www.exchangerate-api.com/docs",
+  "terms_of_use": "https://www.exchangerate-api.com/terms",
+  "time_last_update_unix": 1709625600,
+  "time_last_update_utc": "Wed, 05 Mar 2026 00:00:00 +0000",
+  "time_next_update_unix": 1709712000,
+  "time_next_update_utc": "Thu, 06 Mar 2026 00:00:00 +0000",
+  "base_code": "USD",
+  "target_code": "ARS",
+  "conversion_rate": 350.0,
+  "conversion_result": 35000.0
+}
+```
+
+The application extracts the `conversion_result` field:
+
+```java
+JsonElement elemento = JsonParser.parseString(respuesta.body());
+JsonObject objectRoot = elemento.getAsJsonObject();
+return objectRoot.get("conversion_result").getAsDouble();
+```
+
+<Info>
+JSON parsing is handled in `ConsultaMoneda.java:26-29`
+</Info>
+
+## Rate Accuracy and Updates
+
+### Real-Time Rates
+
+Every conversion performs a fresh API request, ensuring you always get the most current exchange rates available. There is no caching of rates in the application.
+
+<Note>
+Each call to `consulta.obtenerTasa()` triggers a new HTTP request to ExchangeRate-API (`ConversorApp.java:79`)
+</Note>
+
+### Update Frequency
+
+ExchangeRate-API updates its rates:
+- **Standard tier**: Updates once per day (UTC midnight)
+- **Real-time data**: Reflects market conditions as of the last API update
+
+### Rate Precision
+
+Conversion results are returned as Java `double` values, providing:
+- High precision for decimal calculations
+- Accurate representation of fractional currency amounts
+- Support for currencies with different decimal places
+
+### HTTP Client Implementation
+
+The application uses Java's modern `HttpClient` API (introduced in Java 11):
+
+```java
+HttpClient cliente = HttpClient.newHttpClient();
+HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(url))
+        .GET()
+        .build();
+HttpResponse<String> respuesta = cliente.send(request, 
+        HttpResponse.BodyHandlers.ofString());
+```
+
+<Info>
+HTTP client implementation is in `ConsultaMoneda.java:16-24`
+</Info>
+
+## Currency Code Standards
+
+All currency codes follow the **ISO 4217** international standard:
+
+| Code | Currency | Country |
+|------|----------|----------|
+| USD  | United States Dollar | United States |
+| ARS  | Argentine Peso | Argentina |
+| BRL  | Brazilian Real | Brazil |
+| COP  | Colombian Peso | Colombia |
+
+<Note>
+These three-letter codes are used in both the API requests and the history tracking system
+</Note>
+
+## Error Handling
+
+If the API is unreachable or returns an error:
+
+```java
+catch (Exception e) {
+    System.out.println("Error al conectar con la API: " + e.getMessage());
+    return 0;
+}
+```
+
+The application:
+1. Displays an error message with details
+2. Returns `0` as the conversion result
+3. Continues running (doesn't crash)
+4. Still saves the failed conversion to history
+
+<Info>
+Error handling is implemented in `ConsultaMoneda.java:31-34`
+</Info>
