@@ -1,0 +1,58 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Currency Converter",
+  "projectDescription": "A Java-based command-line currency converter that uses real-time exchange rates from ExchangeRate-API to convert between USD, ARS, BRL, and COP.",
+  "theme": "mint",
+  "primaryColor": "#10b981",
+  "lightColor": "#34d399",
+  "darkColor": "#059669",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "User Guide",
+        "pages": [
+          "guides/using-converter",
+          "guides/conversion-history",
+          "guides/supported-currencies"
+        ]
+      },
+      {
+        "group": "Technical Reference",
+        "pages": [
+          "reference/architecture",
+          "reference/api-integration",
+          "reference/code-structure"
+        ]
+      },
+      {
+        "group": "Development",
+        "pages": [
+          "development/building",
+          "development/dependencies",
+          "development/contributing"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Real-time currency conversion using ExchangeRate-API",
+    "Support for USD, Argentine Peso (ARS), Brazilian Real (BRL), and Colombian Peso (COP)",
+    "Interactive command-line menu interface",
+    "Conversion history tracking with timestamps",
+    "Object-oriented architecture with MVC pattern"
+  ],
+  "publicApiSurface": [
+    "ConsultaMoneda.obtenerTasa(String monedaBase, String monedaObjetivo, double cantidad)",
+    "RegistroConversion record (String monedaBase, String monedaObjetivo, double cantidad, double resultado, LocalDateTime fechaHora)",
+    "Conversor.eleccionUserMenu()",
+    "ConversorApp.main(String[] args)"
+  ]
+}
